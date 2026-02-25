@@ -51,8 +51,8 @@ jobs:
       - name: Copy files from ${{ matrix.package_type }} Docker container
         run: |
           mkdir -p ./bin/${{ matrix.package_type }}
-          docker cp ${{ matrix.package_type }}:/builder/bin/packages/x86_64/utilities/. ./bin/${{ matrix.package_type }}/
-          docker cp ${{ matrix.package_type }}:/builder/bin/packages/x86_64/luci/. ./bin/${{ matrix.package_type }}/
+          docker cp ${{ matrix.package_type }}:/builder/bin/. ./bin-tmp/
+          find ./bin-tmp -name "*.${{ matrix.package_type }}" -exec cp {} ./bin/${{ matrix.package_type }}/ \;
 
         # IPK uses underscore `_` in filenames, while APK uses only dash `-`
       - name: Fix naming difference between build for packages (replace _ with -)
