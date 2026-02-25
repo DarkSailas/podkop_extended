@@ -24,7 +24,7 @@ const EntryPoint = {
     const podkopMap = new form.Map(
       "podkop",
       _("Podkop Settings"),
-      _("Configuration for Podkop service"),
+      _("Configuration for Podkop Extended service on OpenWRT"),
     );
     // Enable tab views
     podkopMap.tabbed = true;

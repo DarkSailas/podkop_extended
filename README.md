@@ -1,8 +1,5 @@
-# 🕳️ Podkop Extended (OpenWRT 24+)
-
 [![GitHub release](https://img.shields.io/github/v/release/DarkSailas/podkop_extended?style=flat-square)](https://github.com/DarkSailas/podkop_extended/releases)
 [![License](https://img.shields.io/github/license/DarkSailas/podkop_extended?style=flat-square)](LICENSE)
-[![Telegram](https://img.shields.io/badge/Telegram-Join-blue?style=flat-square&logo=telegram)](https://t.me/itdogchat)
 
 **Podkop Extended** — это глубоко модернизированная версия оригинального проекта Podkop, адаптированная для современных реалий OpenWRT 24+ и Firewall4. 
 
@@ -54,7 +51,7 @@ sh <(wget -q -O - https://raw.githubusercontent.com/DarkSailas/podkop_extended/r
 ---
 
 ## 🤝 Обратная связь
-Проект находится в активной разработке. Если нашли баг или есть идея — создавайте Issue или пишите в наш [телеграм-чат](https://t.me/itdogchat).
+Проект находится в активной разработке. Если нашли баг или есть идея — создавайте Issue в этом репозитории.
 
 ---
 *Created with ❤️ by DarkSailas based on ITDog's original Podkop.*

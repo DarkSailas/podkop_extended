@@ -3,7 +3,8 @@
 "require uci";
 "require baseclass";
 "require tools.widgets as widgets";
-"require view.podkop.main as main";
+"require view.podkop.constants as constants";
+"require view.podkop.validators as validators";
 
 function createSettingsContent(section) {
   let o = section.option(
@@ -24,19 +25,17 @@ function createSettingsContent(section) {
     _("DNS Server"),
     _("Select or enter DNS server address"),
   );
-  Object.entries(main.DNS_SERVER_OPTIONS).forEach(([key, label]) => {
+  Object.entries(constants.DNS_SERVER_OPTIONS).forEach(([key, label]) => {
     o.value(key, _(label));
   });
   o.default = "8.8.8.8";
   o.rmempty = false;
   o.validate = function (section_id, value) {
-    const validation = main.validateDNS(value);
-
-    if (validation.valid) {
+    if (validators.dns(value)) {
       return true;
     }
 
-    return validation.message;
+    return _("Invalid DNS server format. Examples: 8.8.8.8 or dns.google");
   };
 
   o = section.option(
@@ -47,19 +46,17 @@ function createSettingsContent(section) {
       "The DNS server used to look up the IP address of an upstream DNS server",
     ),
   );
-  Object.entries(main.BOOTSTRAP_DNS_SERVER_OPTIONS).forEach(([key, label]) => {
+  Object.entries(constants.BOOTSTRAP_DNS_SERVER_OPTIONS).forEach(([key, label]) => {
     o.value(key, _(label));
   });
   o.default = "77.88.8.8";
   o.rmempty = false;
   o.validate = function (section_id, value) {
-    const validation = main.validateDNS(value);
-
-    if (validation.valid) {
+    if (validators.dns(value)) {
       return true;
     }
 
-    return validation.message;
+    return _("Invalid DNS server format");
   };
 
   o = section.option(
@@ -149,7 +146,7 @@ function createSettingsContent(section) {
 
     // Reject lan*
     if (
-        value.startsWith("lan")
+      value.startsWith("lan")
     ) {
       return false;
     }
@@ -235,7 +232,7 @@ function createSettingsContent(section) {
     form.Flag,
     "enable_yacd",
     _("Enable YACD"),
-    `<a href="${main.getClashUIUrl()}" target="_blank">${main.getClashUIUrl()}</a>`,
+    `<a href="http://${window.location.hostname}:9090/ui" target="_blank">http://${window.location.hostname}:9090/ui</a>`,
   );
   o.default = "0";
   o.rmempty = false;
@@ -276,7 +273,7 @@ function createSettingsContent(section) {
     _("List Update Frequency"),
     _("Select how often the domain or subnet lists are updated automatically"),
   );
-  Object.entries(main.UPDATE_INTERVAL_OPTIONS).forEach(([key, label]) => {
+  Object.entries(constants.UPDATE_INTERVAL_OPTIONS).forEach(([key, label]) => {
     o.value(key, _(label));
   });
   o.default = "1d";
@@ -421,13 +418,13 @@ function createSettingsContent(section) {
       return true;
     }
 
-    const validation = main.validateIPV4(value);
+    const validation = validators.ipv4(value);
 
-    if (validation.valid) {
+    if (validation) {
       return true;
     }
 
-    return validation.message;
+    return _("Invalid IP address");
   };
 }
 

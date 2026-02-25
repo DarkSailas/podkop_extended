@@ -6,7 +6,7 @@ PKG_VERSION := $(if $(PODKOP_VERSION),$(PODKOP_VERSION),0.$(shell date +%d%m%Y))
 
 PKG_RELEASE:=1
 
-PKG_MAINTAINER:=ITDog <podkop@itdog.info>
+PKG_MAINTAINER:=DarkSailas <https://github.com/DarkSailas/podkop_extended>
 PKG_LICENSE:=GPL-2.0-or-later
 
 include $(INCLUDE_DIR)/package.mk
@@ -17,7 +17,7 @@ define Package/podkop
 	DEPENDS:=+sing-box +curl +jq +kmod-nft-tproxy +coreutils-base64 +bind-dig
 	CONFLICTS:=https-dns-proxy nextdns luci-app-passwall luci-app-passwall2
 	TITLE:=Domain routing app
-	URL:=https://podkop.net
+	URL:=https://github.com/DarkSailas/podkop_extended
 	PKGARCH:=all
 endef
 
