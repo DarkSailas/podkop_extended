@@ -139,10 +139,59 @@ start_main() {
     log "Nice"
     list_update &
     echo $! > /var/run/podkop_list_update.pid
+    
+    monitoring &
+    echo $! > /var/run/podkop_monitoring.pid
+}
+
+health_check() {
+    local check_url="http://www.gstatic.com/generate_204"
+    local proxy_address="127.0.0.1:4534" # Service mixed inbound
+    
+    if curl -s -x "http://$proxy_address" --connect-timeout 5 -o /dev/null "$check_url"; then
+        return 0
+    fi
+    return 1
+}
+
+monitoring() {
+    local fail_count=0
+    local max_fails=3
+    local is_failed=0
+    local interval=30
+    
+    while true; do
+        if health_check; then
+            fail_count=0
+            if [ "$is_failed" -eq 1 ]; then
+                log "Proxy is back online. Restoring DNS."
+                dnsmasq_configure
+                is_failed=0
+            fi
+        else
+            fail_count=$((fail_count + 1))
+            log "Proxy health check failed ($fail_count/$max_fails)" "warn"
+            if [ "$fail_count" -ge "$max_fails" ] && [ "$is_failed" -eq 0 ]; then
+                log "Proxy is down. Emergency DNS restore (Failover)." "error"
+                dnsmasq_restore
+                is_failed=1
+            fi
+        fi
+        sleep "$interval"
+    done
 }
 
 stop_main() {
     log "Stopping the podkop"
+
+    if [ -f /var/run/podkop_monitoring.pid ]; then
+        pid=$(cat /var/run/podkop_monitoring.pid)
+        if kill -0 "$pid" 2> /dev/null; then
+            kill "$pid" 2> /dev/null
+            log "Stopped monitoring"
+        fi
+        rm -f /var/run/podkop_monitoring.pid
+    fi
 
     if [ -f /var/run/podkop_list_update.pid ]; then
         pid=$(cat /var/run/podkop_list_update.pid)
