@@ -299,6 +299,20 @@ br_netfilter_disable() {
 
 # Main funcs
 
+backup_config() {
+    local backup_file="/tmp/podkop_backup.tar.gz"
+    log "Creating configuration backup..."
+    
+    tar -czf "$backup_file" /etc/config/podkop /etc/sing-box /usr/share/podkop 2>/dev/null
+    
+    echo "$backup_file"
+}
+
+backup_b64() {
+    tar -czf - /etc/config/podkop /etc/sing-box /usr/share/podkop 2>/dev/null | base64 | tr -d '\n'
+}
+
+
 route_table_rule_mark() {
     grep -q "105 $RT_TABLE_NAME" /etc/iproute2/rt_tables || echo "105 $RT_TABLE_NAME" >> /etc/iproute2/rt_tables
 
@@ -668,6 +682,40 @@ configure_outbound_handler() {
             config="$(sing_box_cm_add_urltest_outbound "$config" "$urltest_tag" "$urltest_outbounds" \
                 "$urltest_testing_url" "$urltest_check_interval" "$urltest_tolerance")"
             config="$(sing_box_cm_add_selector_outbound "$config" "$selector_tag" "$selector_outbounds" "$urltest_tag")"
+            ;;
+        balancer)
+            log "Detected proxy configuration type: balancer (Round Robin/URLTest)" "debug"
+            local balancer_proxy_links udp_over_tcp i balancer_tag selector_tag outbound_tag outbound_tags \
+                balancer_outbounds
+            config_get balancer_proxy_links "$section" "balancer_proxy_links"
+            config_get udp_over_tcp "$section" "enable_udp_over_tcp"
+
+            if [ -z "$balancer_proxy_links" ]; then
+                log "Balancer proxy links is not set. Aborted." "fatal"
+                exit 1
+            fi
+
+            i=1
+            for link in $balancer_proxy_links; do
+                config="$(sing_box_cf_add_proxy_outbound "$config" "$section-$i" "$link" "$udp_over_tcp")"
+                outbound_tag="$(get_outbound_tag_by_section "$section-$i")"
+                if [ -z "$outbound_tags" ]; then
+                    outbound_tags="$outbound_tag"
+                else
+                    outbound_tags="$outbound_tags,$outbound_tag"
+                fi
+                i=$((i + 1))
+            done
+
+            balancer_tag="$(get_outbound_tag_by_section "$section-balancer")"
+            selector_tag="$(get_outbound_tag_by_section "$section")"
+            balancer_outbounds="$(comma_string_to_json_array "$outbound_tags")"
+            
+            # Using urltest with 0 interval and 0 tolerance often behaves like a balancer or fallback
+            # But here we just use short interval for high responsiveness
+            config="$(sing_box_cm_add_urltest_outbound "$config" "$balancer_tag" "$balancer_outbounds" \
+                "https://www.gstatic.com/generate_204" "1m" "50")"
+            config="$(sing_box_cm_add_selector_outbound "$config" "$selector_tag" "$balancer_outbounds" "$balancer_tag")"
             ;;
         *)
             log "Unknown proxy configuration type: '$proxy_config_type'. Aborted." "fatal"
@@ -2637,6 +2685,7 @@ Available commands:
     get_system_info         Get system information in JSON format
     check_dns_available     Check DNS server availability
     global_check            Run global system check
+    backup                  Create configuration backup (.tar.gz)
 EOF
 }
 
@@ -2712,6 +2761,12 @@ check_dns_available)
     ;;
 global_check)
     global_check "${2:-}"
+    ;;
+backup)
+    backup_config
+    ;;
+backup_b64)
+    backup_b64
     ;;
 *)
     show_help

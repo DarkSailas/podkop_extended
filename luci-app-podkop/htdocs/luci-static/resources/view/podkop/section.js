@@ -26,6 +26,7 @@ function createSectionContent(section) {
   o.value("url", _("Connection URL"));
   o.value("selector", _("Selector"));
   o.value("urltest", _("URLTest"));
+  o.value("balancer", _("Balancer (Round Robin)"));
   o.value("outbound", _("Outbound Config"));
   o.default = "url";
   o.depends("connection_type", "proxy");
@@ -112,6 +113,29 @@ function createSectionContent(section) {
     _("vless://, ss://, trojan://, socks4/5://, hy2/hysteria2:// links")
   );
   o.depends("proxy_config_type", "urltest");
+  o.rmempty = false;
+  o.validate = function (section_id, value) {
+    // Optional
+    if (!value || value.length === 0) {
+      return true;
+    }
+
+    const validation = main.validateProxyUrl(value);
+
+    if (validation.valid) {
+      return true;
+    }
+
+    return validation.message;
+  };
+
+  o = section.option(
+    form.DynamicList,
+    "balancer_proxy_links",
+    _("Balancer Proxy Links"),
+    _("vless://, ss://, trojan://, socks4/5://, hy2/hysteria2:// links")
+  );
+  o.depends("proxy_config_type", "balancer");
   o.rmempty = false;
   o.validate = function (section_id, value) {
     // Optional
@@ -298,7 +322,7 @@ function createSectionContent(section) {
     "community_lists",
     _("Community Lists"),
     _("Select a predefined list for routing") +
-      ' <a href="https://github.com/itdoginfo/allow-domains" target="_blank">github.com/itdoginfo/allow-domains</a>',
+    ' <a href="https://github.com/itdoginfo/allow-domains" target="_blank">github.com/itdoginfo/allow-domains</a>',
   );
   o.placeholder = "Service list";
   Object.entries(main.DOMAIN_LIST_OPTIONS).forEach(([key, label]) => {
@@ -505,7 +529,7 @@ function createSectionContent(section) {
     _("User Subnets List"),
     _(
       "Enter subnets in CIDR notation or single IP addresses, separated by commas, spaces, or newlines. " +
-        "You can add comments using //",
+      "You can add comments using //",
     ),
   );
   o.placeholder =
@@ -678,7 +702,7 @@ function createSectionContent(section) {
     _("Mixed Proxy Port"),
     _(
       "Specify the port number on which the mixed proxy will run for this section. " +
-        "Make sure the selected port is not used by another service",
+      "Make sure the selected port is not used by another service",
     ),
   );
   o.rmempty = false;

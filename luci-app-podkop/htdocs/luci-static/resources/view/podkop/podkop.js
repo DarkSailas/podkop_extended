@@ -14,11 +14,18 @@
 // Dashboard content
 "require view.podkop.dashboard as dashboard";
 
+// Backup content
+"require view.podkop.backup as backup";
+
 // Diagnostic content
 "require view.podkop.diagnostic as diagnostic";
 
+// Styles
+"require view.podkop.styles as styles";
+
 const EntryPoint = {
   async render() {
+    styles.inject();
     main.injectGlobalStyles();
 
     const podkopMap = new form.Map(
@@ -87,6 +94,21 @@ const EntryPoint = {
 
     // Render dashboard content
     dashboard.createDashboardContent(dashboardSection);
+
+    // Backup tab
+    const backupSection = podkopMap.section(
+      form.TypedSection,
+      "backup",
+      _("Backup"),
+    );
+    backupSection.anonymous = true;
+    backupSection.addremove = false;
+    backupSection.cfgsections = function () {
+      return ["backup"];
+    };
+
+    // Render backup content
+    backup.createBackupContent(backupSection);
 
     // Inject core service
     main.coreService();
