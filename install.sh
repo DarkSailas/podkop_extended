@@ -1,9 +1,9 @@
 #!/bin/sh
 # shellcheck shell=dash
 
-GITHUB_USER="Sailas"
+GITHUB_USER="DarkSailas"
 GITHUB_REPO="podkop_extended"
-# For private repo downloading
+# For repo downloading
 API_URL="https://api.github.com/repos/$GITHUB_USER/$GITHUB_REPO/releases/latest"
 REPO="$API_URL"
 DOWNLOAD_DIR="/tmp/podkop"
@@ -136,7 +136,7 @@ main() {
 
     if command -v curl >/dev/null 2>&1; then
         if [ -z "$GITHUB_TOKEN" ]; then
-            msg "WARNING: GITHUB_TOKEN is not set. Downloading from a private repository will fail!"
+            msg "INFO: GITHUB_TOKEN is not set. Using public access."
         fi
         check_response=$(curl_auth "$API_URL")
 

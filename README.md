@@ -19,9 +19,9 @@ https://podkop.net/
 # Установка Podkop
 Полная информация в [документации](https://podkop.net/docs/install/)
 
-Вкратце, для установки или обновления используйте эту команду (необходимо подставить ваш GitHub Personal Access Token, так как репозиторий приватный):
+Вкратце, для установки или обновления используйте эту команду:
 ```bash
-GITHUB_TOKEN="ghp_xxx" sh <(wget -q --header="Authorization: token $GITHUB_TOKEN" -O - https://raw.githubusercontent.com/Sailas/podkop_extended/refs/heads/main/install.sh)
+sh <(wget -q -O - https://raw.githubusercontent.com/DarkSailas/podkop_extended/refs/heads/main/install.sh)
 ```
 
 ## Изменения 0.7.0
@@ -38,7 +38,7 @@ mv /etc/config/podkop /etc/config/podkop-070
 ```
 2. Стянуть новый дефолтный конфиг:
 ```bash
-wget -q --header="Authorization: token $GITHUB_TOKEN" -O /etc/config/podkop https://raw.githubusercontent.com/Sailas/podkop_extended/refs/heads/main/podkop/files/etc/config/podkop
+wget -q -O /etc/config/podkop https://raw.githubusercontent.com/DarkSailas/podkop_extended/refs/heads/main/podkop/files/etc/config/podkop
 ```
 3. Настроить заново ваш Podkop через Luci или UCI.
 
