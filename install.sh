@@ -107,9 +107,11 @@ update_config() {
             case $CONFIG_UPDATE in
 
             yes|y|Y)
-                mv /etc/config/podkop /etc/config/podkop-070
+                local backup_name="/etc/config/podkop-orig"
+                [ -f "$backup_name" ] && backup_name="/etc/config/podkop-orig-$(date +%s)"
+                mv /etc/config/podkop "$backup_name"
                 wget -O /etc/config/podkop https://raw.githubusercontent.com/DarkSailas/podkop_extended/refs/heads/main/podkop/files/etc/config/podkop
-                msg "Podkop config has been reset to default. Your old config saved in /etc/config/podkop-070"
+                msg "Podkop config has been reset to default. Your old config saved in $backup_name"
                 break
                 ;;
             *)
@@ -276,14 +278,11 @@ check_system() {
             minor=$(echo "$version" | cut -d. -f2)
             patch=$(echo "$version" | cut -d. -f3)
 
-            # Compare version: must be >= 0.7.0
-            if [ "$major" -gt 0 ] ||
-                [ "$major" -eq 0 ] && [ "$minor" -gt 7 ] ||
-                [ "$major" -eq 0 ] && [ "$minor" -eq 7 ] && [ "$patch" -ge 0 ]; then
-                msg "Podkop version >= 0.7.0"
-                break
+            # Compare version: must be >= 1.0.0
+            if [ "$major" -ge 1 ]; then
+                msg "Podkop version >= 1.0.0"
             else
-                msg "Podkop version < 0.7.0"
+                msg "Podkop version < 1.0.0 (Detected old or original version)"
                 update_config
             fi
         else
