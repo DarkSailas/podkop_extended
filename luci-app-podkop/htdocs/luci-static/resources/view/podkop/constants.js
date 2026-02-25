@@ -1,6 +1,8 @@
 "use strict";
 
-return {
+"require baseclass";
+
+return baseclass.extend({
     PKG_NAME: "podkop",
     VERSION: "__COMPILED_VERSION_VARIABLE__",
     GITHUB_URL: "https://github.com/DarkSailas/podkop_extended",
@@ -25,4 +27,4 @@ return {
         "1d": "Every day",
         "1w": "Every week"
     }
-};
+});

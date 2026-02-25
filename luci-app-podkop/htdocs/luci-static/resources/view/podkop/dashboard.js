@@ -4,7 +4,6 @@
 "require ui";
 "require uci";
 "require fs";
-"require ui";
 "require rpc";
 
 const callServiceStatus = rpc.declare({
